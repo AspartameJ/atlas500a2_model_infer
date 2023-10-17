@@ -1,0 +1,6 @@
+opencv
+numpy
+argparse
+datetime
+multiprocessing
+random
