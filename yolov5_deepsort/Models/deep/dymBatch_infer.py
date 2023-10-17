@@ -39,23 +39,4 @@ class InferSession(object):
         ret = acl.rt.memcpy(self.total_buffer, img_size, image.data(), img_size, ACL_MEMCPY_HOST_TO_DEVICE)
         check_ret("acl.rt.memcpy", ret)
         batch_buffer = {'data': self.total_buffer, 'size':self.total_size}
-        return self._model._execute_with_dynamic_batch_size([batch_buffer, ], batch)   
-
-
-def main():
-    #Instance classification detection, pass into the OM model storage path, model input width and height parameters
-    MODEL_PATH = "ckpt1_bs1-100.310p3.7.0.rc1.alpha003.om"
-    MODEL_WIDTH = 64
-    MODEL_HEIGHT = 128
-    MAX_BATCH = 100
-    infersession = InferSession(MODEL_PATH, MODEL_WIDTH, MODEL_HEIGHT, MAX_BATCH)
-    #Read the pictures
-    im_batch = ""
-    #Reasoning pictures
-    batch_size = 11
-    result = infersession.infer(im_batch, batch_size)
-    print(result[0].shape)
-
-if __name__ == '__main__':
-    main()
- 
+        return self._model._execute_with_dynamic_batch_size([batch_buffer, ], batch)
