@@ -49,9 +49,9 @@ class human_track():
         self.output_ratio = 1.0
         self.resize_fn = ResizePadding(self.target_size[0], self.target_size[1])
         # 加载YOLO模型
-        self.detection_model = AclLiteModel("yolov5s_nms_bs1.om")
+        self.detection_model = AclLiteModel('yolov5s_nms_bs1.310b1.7.0.rc1.alpha003.om')
         # 加载DeepSort追踪器
-        self.sort = DeepSort('om310p3/ckpt1_bs1-100.310p3.7.0.rc1.alpha003.om', max_iou_distance=0.7, max_age=50, nn_budget=50)
+        self.sort = DeepSort('ckpt1_bs1-100.310b1.7.0.rc1.alpha003.om', max_iou_distance=0.7, max_age=50, nn_budget=50)
         # 初始化追踪路径字典，颜色字典和最后更新时间字典
         self.track_dict = {}
         self.color_dict = {}
@@ -150,15 +150,15 @@ class human_track():
             frame = cv2.putText(frame, 'FPS: %f' % (1.0 / (time.time() - fps_time)), (10, 20), cv2.FONT_HERSHEY_SIMPLEX,
                                 0.5, (0, 255, 0), 1)
             fps_time = time.time()
-            cv2.imshow("1", frame)
-            cv2.waitKey(15)
+            # cv2.imshow("1", frame)
+            # cv2.waitKey(15)
 
             if save_out != "":
                 writer.write(frame)
             
         if save_out != "":
             writer.release()
-        cv2.destroyAllWindows()
+        # cv2.destroyAllWindows()
         cam.stop()
 
     # 返回当前时间

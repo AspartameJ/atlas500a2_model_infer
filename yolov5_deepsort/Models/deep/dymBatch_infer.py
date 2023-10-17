@@ -3,7 +3,7 @@ import os
 import acl
 
 path = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(path, "acllite"))
+sys.path.append(os.path.join(path, "../../../acllite"))
 
 from acllite_utils import check_ret
 from constants import ACL_MEM_MALLOC_HUGE_FIRST, ACL_MEMCPY_HOST_TO_DEVICE

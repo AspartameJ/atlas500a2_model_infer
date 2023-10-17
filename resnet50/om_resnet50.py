@@ -15,7 +15,7 @@ import cv2
 #set path 
 currentPath =  os.path.join(path)
 OUTPUT_DIR = os.path.join(currentPath, 'out')
-MODEL_PATH = os.path.join(currentPath,"resnet50.om")
+MODEL_PATH = os.path.join(currentPath,'resnet50.310b1.7.0.rc1.alpha003.om')
 
 #set model size 
 DEVICE_ID=0
