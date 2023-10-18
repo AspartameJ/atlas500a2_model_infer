@@ -7,7 +7,6 @@ from video_capture.CamLoader_v2 import CamLoader, CamLoader_Q
 from datetime import datetime
 from multiprocessing import Process
 import argparse
-# from Detection.Utils import ResizePadding
 import random
 
 sys.path.append("Models/")
