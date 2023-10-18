@@ -7,15 +7,13 @@ from video_capture.CamLoader_v2 import CamLoader, CamLoader_Q
 from datetime import datetime
 from multiprocessing import Process
 import argparse
+# from Detection.Utils import ResizePadding
 import random
 
 sys.path.append("Models/")
 from Models.deep_sort import DeepSort
 
-import acl
-sys.path.append("../acllite/")
-from acllite_model import AclLiteModel
-from acllite_resource import AclLiteResource
+from ais_bench.infer.interface import InferSession
 
 def ResizePadding(height, width):
     desized_size = (height, width)
@@ -48,9 +46,9 @@ class human_track():
         self.output_ratio = 1.0
         self.resize_fn = ResizePadding(self.target_size[0], self.target_size[1])
         # 加载YOLO模型
-        self.detection_model = AclLiteModel('yolov5s_nms_bs1.310b1.7.0.rc1.alpha003.om')
+        self.detection_model = self.local_yolo_model()
         # 加载DeepSort追踪器
-        self.sort = DeepSort('ckpt1_bs1-100.310b1.7.0.rc1.alpha003.om', max_iou_distance=0.7, max_age=50, nn_budget=50)
+        self.sort = DeepSort('ckpt1_bs_dynamic.om', max_iou_distance=0.7, max_age=50, nn_budget=50)
         # 初始化追踪路径字典，颜色字典和最后更新时间字典
         self.track_dict = {}
         self.color_dict = {}
@@ -59,6 +57,14 @@ class human_track():
         self.frame_count = 0
         # 设置最大追踪路径长度
         self.max_track_length = 20
+
+    # 加载YOLO模型
+    def local_yolo_model(self):
+        device_id = 0
+        model_path = "yolov5s_nms_bs1.om"
+        self.session = InferSession(device_id, model_path) 
+        detection_model = self.session
+        return detection_model
 
     def __call__(self, cam_source, save_out=""):
         # ==== video output setup========
@@ -109,7 +115,7 @@ class human_track():
             img=np.ascontiguousarray(img)
             img=np.stack(img, axis=0)
             # om推理
-            outputs = self.detection_model.execute([img, img_info])
+            outputs = self.detection_model.infer([img, img_info])
             # 推理后处理
             box_out = outputs[0]
             box_out_num = outputs[1]
@@ -154,7 +160,7 @@ class human_track():
 
             if save_out != "":
                 writer.write(frame)
-            
+
         if save_out != "":
             writer.release()
         # cv2.destroyAllWindows()
@@ -247,8 +253,6 @@ class human_track():
 
 
 def detect_fun(source_str, save_out):
-    acl_resource = AclLiteResource()
-    acl_resource.init()
     human_track_modle = human_track()
     human_tracker = human_track_modle(cam_source=source_str, save_out=save_out)
 
@@ -257,7 +261,7 @@ if __name__ == '__main__':
     # 解析命令行参数
     par = argparse.ArgumentParser(description='Human Tracking Program.')
     par.add_argument("--source", default="video.mp4", help="stream source")
-    par.add_argument("--save_out", default="./result.mp4", help="stream source")
+    par.add_argument("--save_out", default="", help="stream source")
 
     args = par.parse_args()
     source_str = args.source

@@ -1,15 +1,16 @@
 import numpy as np
 import cv2
-# import aclruntime
-# from ais_bench.infer.interface import InferSession
-from .dymBatch_infer import InferSession
+from ais_bench.infer.interface import InferSession
 
 
 class Extractor(object):
     def __init__(self, model_path, use_cuda=True):
+        self.device_id = 0
+        self.net = InferSession(self.device_id, model_path) 
+        self.mode = "dymshape"
+        self.outputSizes = [100000]
+
         self.size = (64, 128)
-        self.max_batch = 100
-        self.net = InferSession(model_path, self.size[0], self.size[1], self.max_batch) 
 
     def _preprocess(self, im_crops):
         """
@@ -39,7 +40,6 @@ class Extractor(object):
 
     def __call__(self, im_crops):
         im_batch = self._preprocess(im_crops)
-        batch_size = im_batch.shape[0]
-        features = self.net.infer(im_batch, batch_size)
+        features = self.net.infer([im_batch], self.mode, custom_sizes=self.outputSizes)
         return features[0]
     
